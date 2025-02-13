@@ -1,7 +1,7 @@
-const express = require("express");
+import express from "express";
 
-const user = require("./routes/users");
-const cards = require("./routes/cards");
+import { user_router } from "./routes/users.js";
+import { cards_router } from "./routes/cards.js";
 
 const app = express();
 
@@ -11,9 +11,9 @@ const notFound = (req, res, next) => {
   res.status(404).send({ message: "A solicitação não foi encontrada" });
 };
 
-app.use("/", user);
-app.use("/", cards);
-app.use("*", notFound);
+app.use("/users", user_router);
+app.use("/cards", cards_router);
+app.use("", notFound);
 
 app.listen(PORT, () => {
   console.log(`App executando na porta ${PORT}`);

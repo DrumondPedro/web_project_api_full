@@ -1,4 +1,9 @@
-const cards = require("express").Router();
+import { Router } from "express";
+import fs from "node:fs";
+import path from "node:path";
+
+const __dirname = import.meta.dirname;
+const cards_router = Router();
 
 const cardsData = [
   {
@@ -65,6 +70,6 @@ const sendAllCards = (req, res, next) => {
   res.send(cardsData);
 };
 
-cards.get("/cards", sendAllCards);
+cards_router.get("/", sendAllCards);
 
-module.exports = cards;
+export { cards_router };

@@ -1,4 +1,9 @@
-const users = require("express").Router();
+import { Router } from "express";
+import fs from "node:fs";
+import path from "node:path";
+
+const __dirname = import.meta.dirname;
+const user_router = Router();
 
 const usersData = [
   {
@@ -33,7 +38,6 @@ const doesUserExist = (req, res, next) => {
     res.status(404).send({ message: "ID do usuário não encontrado" });
     return;
   }
-
   next();
 };
 
@@ -41,8 +45,8 @@ const sendUser = (req, res, next) => {
   res.send(usersData.filter((user) => user._id === req.params._id));
 };
 
-users.get("/users", sendAllUsers);
+user_router.get("/", sendAllUsers);
 
-users.get("/users/:_id", doesUserExist, sendUser);
+user_router.get("/:_id", doesUserExist, sendUser);
 
-module.exports = users;
+export { user_router };
