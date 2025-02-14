@@ -3,9 +3,9 @@ import fs from "node:fs";
 import path from "node:path";
 
 const __dirname = import.meta.dirname;
-const user_router = Router();
+const userRouter = Router();
 
-var usersData = [];
+let usersData = [];
 
 const filePath = path.join(__dirname, "..", "data", "users.json");
 
@@ -37,8 +37,8 @@ const sendUser = (req, res, next) => {
   res.send(usersData.filter((user) => user._id === req.params._id));
 };
 
-user_router.get("/", sendAllUsers);
+userRouter.get("/", sendAllUsers);
 
-user_router.get("/:_id", doesUserExist, sendUser);
+userRouter.get("/:_id", doesUserExist, sendUser);
 
-export { user_router };
+export { userRouter };
