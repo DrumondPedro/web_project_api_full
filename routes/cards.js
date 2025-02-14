@@ -3,9 +3,9 @@ import fs from "node:fs";
 import path from "node:path";
 
 const __dirname = import.meta.dirname;
-const cards_router = Router();
+const cardsRouter = Router();
 
-var cardsData = [];
+let cardsData = [];
 
 const filePath = path.join(__dirname, "..", "data", "cards.json");
 
@@ -25,6 +25,6 @@ const sendAllCards = (req, res, next) => {
   res.send(cardsData);
 };
 
-cards_router.get("/", sendAllCards);
+cardsRouter.get("/", sendAllCards);
 
-export { cards_router };
+export { cardsRouter };
