@@ -8,16 +8,16 @@ const sendAllCards = () => {
     .catch((err) => console.log(err));
 };
 
-const deleteCard = (id) => {
-  return CardModel.findByIdAndRemove(id).catch((err) => console.log(err));
-};
-
-const createCard = ({ owner, name, link }) => {
-  return CardModel.create({ owner, name, link })
+const createCard = ({ name, link, owner }) => {
+  return CardModel.create({ name, link, owner })
     .then((newCards) => {
       return newCards;
     })
     .catch((err) => console.log(err));
 };
 
-export { sendAllCards, deleteCard, createCard };
+const deleteCard = (id) => {
+  return CardModel.findByIdAndRemove(id).catch((err) => console.log(err));
+};
+
+export { sendAllCards, createCard, deleteCard };
