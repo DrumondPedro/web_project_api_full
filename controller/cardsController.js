@@ -16,8 +16,8 @@ const createCard = ({ name, link, owner }) => {
     .catch((err) => console.log(err));
 };
 
-const deleteCard = (id) => {
-  return CardModel.findByIdAndRemove(id).catch((err) => console.log(err));
+const deleteCard = (cardId) => {
+  return CardModel.findByIdAndDelete(cardId).catch((err) => console.log(err));
 };
 
 export { sendAllCards, createCard, deleteCard };

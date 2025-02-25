@@ -29,12 +29,12 @@ cardsRouter.post("/", async (req, res) => {
 });
 
 cardsRouter.delete("/:cardId", async (req, res) => {
-  const { id } = req.params;
+  const { cardId } = req.params;
   try {
-    await deleteCard(id);
+    await deleteCard(cardId);
     res.status(204).json({});
   } catch (error) {
-    res.json({ error: `Não foi possivel deletar o cartão ${id}` });
+    res.json({ error: `Não foi possivel deletar o cartão ${cardId}` });
   }
 });
 
