@@ -8,6 +8,8 @@ const app = express();
 connectDatabase();
 const { PORT = 3000 } = process.env;
 
+app.use(express.json());
+
 const notFound = (req, res, next) => {
   res.status(404).send({ message: "A solicitação não foi encontrada" });
 };
@@ -19,8 +21,3 @@ app.use("", notFound);
 app.listen(PORT, () => {
   console.log(`App executando na porta ${PORT}`);
 });
-
-// implementar um HATEOAS
-// criar classe de erro personalisada
-// implem,entar sanitização JOI ou ZOD
-// implementar serialização

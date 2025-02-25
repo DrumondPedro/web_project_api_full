@@ -1,8 +1,10 @@
 import mongoose from "mongoose";
 
-async function connectDatabase() {
-  await mongoose.connect("mongodb://localhost:27017/aroundb");
-  console.log("Database conected!");
+function connectDatabase() {
+  mongoose
+    .connect("mongodb://localhost:27017/arounddb")
+    .then(() => console.log("MongoDB conectado com sucesso"))
+    .catch((err) => console.log("Erro de conexão:", err));
 }
 
 export { connectDatabase };
