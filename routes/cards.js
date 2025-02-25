@@ -1,30 +1,41 @@
 import { Router } from "express";
-import fs from "node:fs";
-import path from "node:path";
 
-const __dirname = import.meta.dirname;
+import {
+  sendAllCards,
+  createCard,
+  deleteCard,
+} from "../controller/cardsController.js";
+
 const cardsRouter = Router();
 
-let cardsData = [];
-
-const filePath = path.join(__dirname, "..", "data", "cards.json");
-
-fs.readFile(filePath, { encoding: "utf-8" }, (err, data) => {
-  if (err) {
-    console.log(`Arquivo não encontrado. ${err}`);
-    return;
+cardsRouter.get("/", async (req, res) => {
+  try {
+    const cards = await sendAllCards();
+    res.json(cards);
+  } catch (error) {
+    res.status(404).json({ error: "Cartões não encontrados" });
   }
-  cardsData = JSON.parse(data);
 });
 
-const sendAllCards = (req, res, next) => {
-  if (cardsData.length === 0) {
-    res.status(404).send({ message: "Arquivo não encontrado" });
-    return;
+cardsRouter.post("/", async (req, res) => {
+  const { name, link } = req.body;
+  const owner = req.user._id;
+  try {
+    const newCard = await createCard({ name, link, owner });
+    res.json(newCard);
+  } catch (error) {
+    res.json({ error: `Não foi possivel criar o cartão` });
   }
-  res.send(cardsData);
-};
+});
 
-cardsRouter.get("/", sendAllCards);
+cardsRouter.delete("/:cardId", async (req, res) => {
+  const { id } = req.params;
+  try {
+    await deleteCard(id);
+    res.status(204).json({});
+  } catch (error) {
+    res.json({ error: `Não foi possivel deletar o cartão ${id}` });
+  }
+});
 
 export { cardsRouter };
