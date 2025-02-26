@@ -24,4 +24,36 @@ const createUser = ({ name, about, avatar }) => {
     .catch((err) => console.log(err));
 };
 
-export { sendAllUsers, sendUser, createUser };
+const updateUser = ({ id, name, about }) => {
+  return UserModel.findByIdAndUpdate(
+    id,
+    { name, about },
+    {
+      new: true,
+      runValidators: true,
+      upsert: true,
+    }
+  )
+    .then((updetedUser) => {
+      return updetedUser;
+    })
+    .catch((err) => console.log(err));
+};
+
+const updateUserAvatar = ({ id, avatar }) => {
+  return UserModel.findByIdAndUpdate(
+    id,
+    { avatar },
+    {
+      new: true,
+      runValidators: true,
+      upsert: true,
+    }
+  )
+    .then((updetedUser) => {
+      return updetedUser;
+    })
+    .catch((err) => console.log(err));
+};
+
+export { sendAllUsers, sendUser, createUser, updateUser, updateUserAvatar };
