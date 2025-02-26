@@ -1,44 +1,67 @@
 import { Router } from "express";
-import fs from "node:fs";
-import path from "node:path";
 
-const __dirname = import.meta.dirname;
+import {
+  sendAllUsers,
+  sendUser,
+  createUser,
+  updateUser,
+  updateUserAvatar,
+} from "../controller/usersController.js";
+
 const userRouter = Router();
 
-let usersData = [];
-
-const filePath = path.join(__dirname, "..", "data", "users.json");
-
-fs.readFile(filePath, (err, data) => {
-  if (err) {
-    console.log(`Arquivo não encontrado. ${err}`);
-    return;
+userRouter.get("/", async (req, res) => {
+  try {
+    const users = await sendAllUsers();
+    res.json(users);
+  } catch (error) {
+    res.status(404).json({ error: "Usiarios não encontrados" });
   }
-  usersData = JSON.parse(data);
 });
 
-const sendAllUsers = (req, res, next) => {
-  if (usersData.length === 0) {
-    res.status(404).send({ message: "Arquivo não encontrado" });
-    return;
+userRouter.get("/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const user = await sendUser(id);
+    if (!user) {
+      res.status(404).json({ error: `Usuario ${id} não encontrado` });
+    }
+    res.json(user);
+  } catch (error) {
+    res.status(404).json({ error: `Usuario ${id} não encontrado` });
   }
-  res.send(usersData);
-};
+});
 
-const doesUserExist = (req, res, next) => {
-  if (!usersData.find((user) => user._id === req.params._id)) {
-    res.status(404).send({ message: "ID do usuário não encontrado" });
-    return;
+userRouter.post("/", async (req, res) => {
+  const { name, about, avatar } = req.body;
+  try {
+    const newUser = await createUser({ name, about, avatar });
+    res.status(201).json(newUser);
+  } catch (error) {
+    res.json({ error: `Não foi possivel criar usuário` });
   }
-  next();
-};
+});
 
-const sendUser = (req, res, next) => {
-  res.send(usersData.filter((user) => user._id === req.params._id));
-};
+userRouter.patch("/me", async (req, res) => {
+  const { name, about } = req.body;
+  const id = req.user._id;
+  try {
+    const updetedUser = await updateUser({ id, name, about });
+    res.json(updetedUser);
+  } catch (error) {
+    res.json({ error: `Não foi possivel atualizar usuário` });
+  }
+});
 
-userRouter.get("/", sendAllUsers);
-
-userRouter.get("/:_id", doesUserExist, sendUser);
+userRouter.patch("/me/avatar", async (req, res) => {
+  const { avatar } = req.body;
+  const id = req.user._id;
+  try {
+    const updetedUser = await updateUserAvatar({ id, avatar });
+    res.json(updetedUser);
+  } catch (error) {
+    res.json({ error: `Não foi possivel atualizar avatar` });
+  }
+});
 
 export { userRouter };
