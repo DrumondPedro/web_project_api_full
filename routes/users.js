@@ -1,6 +1,12 @@
 import { Router } from "express";
+import { z } from "zod";
 
 import CustomHttpError from "../errors/CustomHttpError.js";
+import {
+  validateCreateUser,
+  validateUpdateUser,
+  validateUpdateAvatar,
+} from "../validator/userValidator.js";
 
 import {
   sendAllUsers,
@@ -57,13 +63,7 @@ userRouter.get("/:id", async (req, res) => {
 userRouter.post("/", async (req, res) => {
   const { name, about, avatar } = req.body;
   try {
-    if (!name || !about || !avatar) {
-      const newError = new CustomHttpError({
-        message: `Não foi possivel criar usuário.`,
-      });
-      newError.badRequest({ method: "POST", path: "Create User" });
-      throw newError;
-    }
+    validateCreateUser.parse({ name, about, avatar });
     const newUser = await createUser({ name, about, avatar });
     if (!newUser) {
       const newError = new CustomHttpError({
@@ -74,6 +74,14 @@ userRouter.post("/", async (req, res) => {
     }
     res.status(201).json(newUser);
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      const [err] = error.issues;
+      const newError = new CustomHttpError({
+        message: `${err.path}: ${err.message}`,
+      });
+      newError.badRequest({ method: "POST", path: "Create User" });
+      error = newError;
+    }
     const { message, typeError, statusCode } = error;
     console.log(`Error: ${message} - ${typeError} - Status:${statusCode}`);
     res.status(statusCode).json({ message: `Não foi possivel criar usuário.` });
@@ -84,13 +92,7 @@ userRouter.patch("/me", async (req, res) => {
   const { name, about } = req.body;
   const id = req.user._id;
   try {
-    if (!name || !about || !id) {
-      const newError = new CustomHttpError({
-        message: `Não foi possivel atualizar suário com o ID: ${id}`,
-      });
-      newError.badRequest({ method: "PATCH", path: "Update User" });
-      throw newError;
-    }
+    validateUpdateUser.parse({ id, name, about });
     const updetedUser = await updateUser({ id, name, about });
     if (!updetedUser) {
       const newError = new CustomHttpError({
@@ -101,6 +103,14 @@ userRouter.patch("/me", async (req, res) => {
     }
     res.json(updetedUser);
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      const [err] = error.issues;
+      const newError = new CustomHttpError({
+        message: `${err.path}: ${err.message}`,
+      });
+      newError.badRequest({ method: "POST", path: "Update User" });
+      error = newError;
+    }
     const { message, typeError, statusCode } = error;
     console.log(`Error: ${message} - ${typeError} - Status:${statusCode}`);
     res
@@ -113,13 +123,7 @@ userRouter.patch("/me/avatar", async (req, res) => {
   const { avatar } = req.body;
   const id = req.user._id;
   try {
-    if (!avatar || !id) {
-      const newError = new CustomHttpError({
-        message: `Não foi possivel atualizar suário com o ID: ${id}`,
-      });
-      newError.badRequest({ method: "PATCH", path: "Update User" });
-      throw newError;
-    }
+    validateUpdateAvatar.parse({ id, avatar });
     const updetedUser = await updateUserAvatar({ id, avatar });
     if (!updetedUser) {
       const newError = new CustomHttpError({
@@ -130,6 +134,14 @@ userRouter.patch("/me/avatar", async (req, res) => {
     }
     res.json(updetedUser);
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      const [err] = error.issues;
+      const newError = new CustomHttpError({
+        message: `${err.path}: ${err.message}`,
+      });
+      newError.badRequest({ method: "POST", path: "Update Avatar User" });
+      error = newError;
+    }
     const { message, typeError, statusCode } = error;
     console.log(`Error: ${message} - ${typeError} - Status:${statusCode}`);
     res
