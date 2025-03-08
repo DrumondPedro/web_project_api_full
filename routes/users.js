@@ -1,4 +1,12 @@
 import { Router } from "express";
+import { z } from "zod";
+
+import CustomHttpError from "../errors/CustomHttpError.js";
+import {
+  validateCreateUser,
+  validateUpdateUser,
+  validateUpdateAvatar,
+} from "../validator/userValidator.js";
 
 import {
   sendAllUsers,
@@ -13,9 +21,21 @@ const userRouter = Router();
 userRouter.get("/", async (req, res) => {
   try {
     const users = await sendAllUsers();
+    if (!users.length) {
+      const newError = new CustomHttpError({
+        message: "Nenhum usuário encontrado",
+      });
+      newError.notFound({
+        method: "GET",
+        path: "Users",
+      });
+      throw newError;
+    }
     res.json(users);
   } catch (error) {
-    res.status(404).json({ error: "Usiarios não encontrados" });
+    const { message, typeError, statusCode } = error;
+    console.log(`Error: ${message} - ${typeError} - Status: ${statusCode}`);
+    res.status(statusCode).json({ message: "Nenhum usuário encontrado." });
   }
 });
 
@@ -24,21 +44,47 @@ userRouter.get("/:id", async (req, res) => {
   try {
     const user = await sendUser(id);
     if (!user) {
-      res.status(404).json({ error: `Usuario ${id} não encontrado` });
+      const newError = new CustomHttpError({
+        message: `Não foi possivel encontrar suário com o ID: ${id}`,
+      });
+      newError.notFound({ method: "GET", path: "Users" });
+      throw newError;
     }
     res.json(user);
   } catch (error) {
-    res.status(404).json({ error: `Usuario ${id} não encontrado` });
+    const { message, typeError, statusCode } = error;
+    console.log(`Error: ${message} - ${typeError} - Status:${statusCode}`);
+    res
+      .status(statusCode)
+      .json({ message: `Não foi possivel encontrar suário com o ID: ${id}` });
   }
 });
 
 userRouter.post("/", async (req, res) => {
   const { name, about, avatar } = req.body;
   try {
+    validateCreateUser.parse({ name, about, avatar });
     const newUser = await createUser({ name, about, avatar });
+    if (!newUser) {
+      const newError = new CustomHttpError({
+        message: `Não foi possivel criar usuário.`,
+      });
+      newError.badRequest({ method: "POST", path: "Create User" });
+      throw newError;
+    }
     res.status(201).json(newUser);
   } catch (error) {
-    res.json({ error: `Não foi possivel criar usuário` });
+    if (error instanceof z.ZodError) {
+      const [err] = error.issues;
+      const newError = new CustomHttpError({
+        message: `${err.path}: ${err.message}`,
+      });
+      newError.badRequest({ method: "POST", path: "Create User" });
+      error = newError;
+    }
+    const { message, typeError, statusCode } = error;
+    console.log(`Error: ${message} - ${typeError} - Status:${statusCode}`);
+    res.status(statusCode).json({ message: `Não foi possivel criar usuário.` });
   }
 });
 
@@ -46,10 +92,30 @@ userRouter.patch("/me", async (req, res) => {
   const { name, about } = req.body;
   const id = req.user._id;
   try {
+    validateUpdateUser.parse({ id, name, about });
     const updetedUser = await updateUser({ id, name, about });
+    if (!updetedUser) {
+      const newError = new CustomHttpError({
+        message: `Não foi possivel atualizar suário com o ID: ${id}`,
+      });
+      newError.badRequest({ method: "PATCH", path: "Update User" });
+      throw newError;
+    }
     res.json(updetedUser);
   } catch (error) {
-    res.json({ error: `Não foi possivel atualizar usuário` });
+    if (error instanceof z.ZodError) {
+      const [err] = error.issues;
+      const newError = new CustomHttpError({
+        message: `${err.path}: ${err.message}`,
+      });
+      newError.badRequest({ method: "POST", path: "Update User" });
+      error = newError;
+    }
+    const { message, typeError, statusCode } = error;
+    console.log(`Error: ${message} - ${typeError} - Status:${statusCode}`);
+    res
+      .status(statusCode)
+      .json({ message: `Não foi possivel atualizar suário com o ID: ${id}` });
   }
 });
 
@@ -57,10 +123,30 @@ userRouter.patch("/me/avatar", async (req, res) => {
   const { avatar } = req.body;
   const id = req.user._id;
   try {
+    validateUpdateAvatar.parse({ id, avatar });
     const updetedUser = await updateUserAvatar({ id, avatar });
+    if (!updetedUser) {
+      const newError = new CustomHttpError({
+        message: `Não foi possivel atualizar suário com o ID: ${id}`,
+      });
+      newError.badRequest({ method: "PATCH", path: "Update Avatar User" });
+      throw newError;
+    }
     res.json(updetedUser);
   } catch (error) {
-    res.json({ error: `Não foi possivel atualizar avatar` });
+    if (error instanceof z.ZodError) {
+      const [err] = error.issues;
+      const newError = new CustomHttpError({
+        message: `${err.path}: ${err.message}`,
+      });
+      newError.badRequest({ method: "POST", path: "Update Avatar User" });
+      error = newError;
+    }
+    const { message, typeError, statusCode } = error;
+    console.log(`Error: ${message} - ${typeError} - Status:${statusCode}`);
+    res
+      .status(statusCode)
+      .json({ message: `Não foi possivel atualizar suário com o ID: ${id}` });
   }
 });
 

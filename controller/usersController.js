@@ -1,59 +1,76 @@
 import { UserModel } from "../models/User.js";
 
-const sendAllUsers = () => {
-  return UserModel.find({})
-    .then((allUsers) => {
-      return allUsers;
-    })
-    .catch((err) => console.log(err));
-};
+import CustomHttpError from "../errors/CustomHttpError.js";
 
-const sendUser = (id) => {
-  return UserModel.findById(id)
-    .then((user) => {
-      return user;
-    })
-    .catch((err) => console.log(err));
-};
+async function sendAllUsers() {
+  try {
+    const allUsers = await UserModel.find({});
+    return allUsers;
+  } catch (error) {
+    const newError = new CustomHttpError({ message: error.message });
+    newError.notFound({ method: "MONGO", path: "Users" });
+    throw newError;
+  }
+}
 
-const createUser = ({ name, about, avatar }) => {
-  return UserModel.create({ name, about, avatar })
-    .then((createdUser) => {
-      return createdUser;
-    })
-    .catch((err) => console.log(err));
-};
+async function sendUser(id) {
+  try {
+    const user = await UserModel.findById(id);
+    return user;
+  } catch (error) {
+    const newError = new CustomHttpError({ message: error.message });
+    newError.notFound({ method: "MONGO", path: "User" });
+    throw newError;
+  }
+}
 
-const updateUser = ({ id, name, about }) => {
-  return UserModel.findByIdAndUpdate(
-    id,
-    { name, about },
-    {
-      new: true,
-      runValidators: true,
-      upsert: true,
-    }
-  )
-    .then((updetedUser) => {
-      return updetedUser;
-    })
-    .catch((err) => console.log(err));
-};
+async function createUser({ name, about, avatar }) {
+  try {
+    const createdUser = await UserModel.create({ name, about, avatar });
+    return createdUser;
+  } catch (error) {
+    const newError = new CustomHttpError({ message: error.message });
+    newError.badRequest({ method: "MONGO", path: "Create User" });
+    throw newError;
+  }
+}
 
-const updateUserAvatar = ({ id, avatar }) => {
-  return UserModel.findByIdAndUpdate(
-    id,
-    { avatar },
-    {
-      new: true,
-      runValidators: true,
-      upsert: true,
-    }
-  )
-    .then((updetedUser) => {
-      return updetedUser;
-    })
-    .catch((err) => console.log(err));
-};
+async function updateUser({ id, name, about }) {
+  try {
+    const updetedUser = await UserModel.findByIdAndUpdate(
+      id,
+      { name, about },
+      {
+        new: true,
+        runValidators: true,
+        upsert: true,
+      }
+    );
+    return updetedUser;
+  } catch (error) {
+    const newError = new CustomHttpError({ message: error.message });
+    newError.badRequest({ method: "MONGO", path: "Update User" });
+    throw newError;
+  }
+}
+
+async function updateUserAvatar({ id, avatar }) {
+  try {
+    const updetedUser = await UserModel.findByIdAndUpdate(
+      id,
+      { avatar },
+      {
+        new: true,
+        runValidators: true,
+        upsert: true,
+      }
+    );
+    return updetedUser;
+  } catch (error) {
+    const newError = new CustomHttpError({ message: error.message });
+    newError.badRequest({ method: "MONGO", path: "Update User" });
+    throw newError;
+  }
+}
 
 export { sendAllUsers, sendUser, createUser, updateUser, updateUserAvatar };
