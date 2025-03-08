@@ -1,6 +1,11 @@
 import { Router } from "express";
+import { z } from "zod";
 
 import CustomHttpError from "../errors/CustomHttpError.js";
+import {
+  validateCreateCard,
+  validateLikeCard,
+} from "../validator/cardValidator.js";
 
 import {
   sendAllCards,
@@ -34,13 +39,7 @@ cardsRouter.post("/", async (req, res) => {
   const { name, link } = req.body;
   const owner = req.user._id;
   try {
-    if (!name || !link || !owner) {
-      const newError = new CustomHttpError({
-        message: `Não foi possivel criar cartão. Dasos invalidos`,
-      });
-      newError.badRequest({ method: "POST", path: "Create Card" });
-      throw newError;
-    }
+    validateCreateCard.parse({ name, link, owner });
     const newCard = await createCard({ name, link, owner });
     if (!newCard) {
       const newError = new CustomHttpError({
@@ -51,6 +50,14 @@ cardsRouter.post("/", async (req, res) => {
     }
     res.json(newCard);
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      const [err] = error.issues;
+      const newError = new CustomHttpError({
+        message: `${err.path}: ${err.message}`,
+      });
+      newError.badRequest({ method: "POST", path: "Create Card" });
+      error = newError;
+    }
     const { message, typeError, statusCode } = error;
     console.log(`Error: ${message} - ${typeError} - Status: ${statusCode}`);
     res
@@ -84,23 +91,25 @@ cardsRouter.put("/:cardId/likes", async (req, res) => {
   const { cardId } = req.params;
   const userId = req.user._id;
   try {
-    if (!cardId || !userId) {
-      const newError = new CustomHttpError({
-        message: `Não foi possivel curtir o cartão. Dasos invalidos`,
-      });
-      newError.badRequest({ method: "POST", path: "Create Card" });
-      throw newError;
-    }
+    validateLikeCard.parse({ cardId, userId });
     const newCard = await likeCard({ cardId, userId });
     if (!newCard) {
       const newError = new CustomHttpError({
         message: `Não foi possivel curtir o cartão.`,
       });
-      newError.badRequest({ method: "POST", path: "Create Card" });
+      newError.badRequest({ method: "POST", path: "Like Card" });
       throw newError;
     }
     res.json(newCard);
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      const [err] = error.issues;
+      const newError = new CustomHttpError({
+        message: `${err.path}: ${err.message}`,
+      });
+      newError.badRequest({ method: "POST", path: "Like Card" });
+      error = newError;
+    }
     const { message, typeError, statusCode } = error;
     console.log(`Error: ${message} - ${typeError} - Status: ${statusCode}`);
     res
@@ -113,23 +122,25 @@ cardsRouter.delete("/:cardId/likes", async (req, res) => {
   const { cardId } = req.params;
   const userId = req.user._id;
   try {
-    if (!cardId || !userId) {
-      const newError = new CustomHttpError({
-        message: `Não foi possivel descurtir o cartão. Dasos invalidos`,
-      });
-      newError.badRequest({ method: "POST", path: "Create Card" });
-      throw newError;
-    }
+    validateLikeCard.parse({ cardId, userId });
     const newCard = await deslikeCard({ cardId, userId });
     if (!newCard) {
       const newError = new CustomHttpError({
         message: `Não foi possivel descurtir o cartão.`,
       });
-      newError.badRequest({ method: "POST", path: "Create Card" });
+      newError.badRequest({ method: "POST", path: "Deslike Card" });
       throw newError;
     }
     res.json(newCard);
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      const [err] = error.issues;
+      const newError = new CustomHttpError({
+        message: `${err.path}: ${err.message}`,
+      });
+      newError.badRequest({ method: "POST", path: "Deslike Card" });
+      error = newError;
+    }
     const { message, typeError, statusCode } = error;
     console.log(`Error: ${message} - ${typeError} - Status: ${statusCode}`);
     res.status(statusCode).json({
