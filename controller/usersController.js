@@ -1,4 +1,5 @@
 import { UserModel } from "../models/User.js";
+
 import CustomHttpError from "../errors/CustomHttpError.js";
 
 async function sendAllUsers() {

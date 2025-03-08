@@ -57,6 +57,13 @@ userRouter.get("/:id", async (req, res) => {
 userRouter.post("/", async (req, res) => {
   const { name, about, avatar } = req.body;
   try {
+    if (!name || !about || !avatar) {
+      const newError = new CustomHttpError({
+        message: `Não foi possivel criar usuário.`,
+      });
+      newError.badRequest({ method: "POST", path: "Create User" });
+      throw newError;
+    }
     const newUser = await createUser({ name, about, avatar });
     if (!newUser) {
       const newError = new CustomHttpError({
