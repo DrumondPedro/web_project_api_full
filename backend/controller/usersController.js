@@ -1,3 +1,5 @@
+import bcrypt from "bcryptjs";
+
 import { UserModel } from "../models/User.js";
 
 import CustomHttpError from "../errors/CustomHttpError.js";
@@ -24,10 +26,23 @@ async function sendUser(id) {
   }
 }
 
-async function createUser({ name, about, avatar }) {
+async function createUser({ name, about, avatar, email, password }) {
   try {
-    const createdUser = await UserModel.create({ name, about, avatar });
-    return createdUser;
+    const hash = await bcrypt.hash(password, 10);
+    const createdUser = await UserModel.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash,
+    });
+    return {
+      name: createdUser.name,
+      about: createdUser.about,
+      avatar: createdUser.avatar,
+      email: createdUser.email,
+      _id: createdUser._id,
+    };
   } catch (error) {
     const newError = new CustomHttpError({ message: error.message });
     newError.badRequest({ method: "MONGO", path: "Create User" });

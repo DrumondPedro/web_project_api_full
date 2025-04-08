@@ -61,10 +61,10 @@ userRouter.get("/:id", async (req, res) => {
 });
 
 userRouter.post("/", async (req, res) => {
-  const { name, about, avatar } = req.body;
+  const { name, about, avatar, email, password } = req.body;
   try {
-    validateCreateUser.parse({ name, about, avatar });
-    const newUser = await createUser({ name, about, avatar });
+    validateCreateUser.parse({ name, about, avatar, email, password });
+    const newUser = await createUser({ name, about, avatar, email, password });
     if (!newUser) {
       const newError = new CustomHttpError({
         message: `Não foi possivel criar usuário.`,
