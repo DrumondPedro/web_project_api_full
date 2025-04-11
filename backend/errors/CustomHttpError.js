@@ -3,14 +3,19 @@ class CustomHttpError extends Error {
     super(message);
   }
 
-  notFound({ method, path }) {
-    this.typeError = `[${method}] - ${path}`;
-    this.statusCode = 404;
-  }
-
   badRequest({ method, path }) {
     this.typeError = `[${method}] - ${path}`;
     this.statusCode = 400;
+  }
+
+  unauthorized({ method, path }) {
+    this.typeError = `[${method}] - ${path}`;
+    this.statusCode = 401;
+  }
+
+  notFound({ method, path }) {
+    this.typeError = `[${method}] - ${path}`;
+    this.statusCode = 404;
   }
 
   internalServerError({ method, path }) {

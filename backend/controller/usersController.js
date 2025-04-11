@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 import { UserModel } from "../models/User.js";
-
 import CustomHttpError from "../errors/CustomHttpError.js";
 
 async function sendAllUsers() {
@@ -50,6 +50,20 @@ async function createUser({ name, about, avatar, email, password }) {
   }
 }
 
+async function login({ email, password }) {
+  try {
+    const user = await UserModel.findUserByCredentials({ email, password });
+    const token = jwt.sign({ _id: user._id }, "some-secret-key", {
+      expiresIn: "7d",
+    });
+    return { token };
+  } catch (error) {
+    const newError = new CustomHttpError({ message: error.message });
+    newError.unauthorized({ method: "MONGO", path: "Login" });
+    throw newError;
+  }
+}
+
 async function updateUser({ id, name, about }) {
   try {
     const updetedUser = await UserModel.findByIdAndUpdate(
@@ -88,4 +102,11 @@ async function updateUserAvatar({ id, avatar }) {
   }
 }
 
-export { sendAllUsers, sendUser, createUser, updateUser, updateUserAvatar };
+export {
+  sendAllUsers,
+  sendUser,
+  createUser,
+  updateUser,
+  updateUserAvatar,
+  login,
+};

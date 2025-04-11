@@ -1,5 +1,8 @@
 import { Schema, model } from "mongoose";
+import bcrypt from "bcryptjs";
+
 import validator from "validator";
+import CustomHttpError from "../errors/CustomHttpError.js";
 
 const userSchema = new Schema(
   {
@@ -49,7 +52,33 @@ const userSchema = new Schema(
       select: false,
     },
   },
-  { versionKey: false }
+  {
+    versionKey: false,
+    statics: {
+      async findUserByCredentials({ email, password }) {
+        try {
+          const user = await this.findOne({ email }).select("+password");
+          if (!user) {
+            const newError = new CustomHttpError({
+              message: `E-mail ou senha incorretos`,
+            });
+            throw newError;
+          }
+          const matched = await bcrypt.compare(password, user.password);
+          if (!matched) {
+            const newError = new CustomHttpError({
+              message: `E-mail ou senha incorretos`,
+            });
+            throw newError;
+          }
+          return user;
+        } catch (error) {
+          const newError = new CustomHttpError({ message: error.message });
+          throw newError;
+        }
+      },
+    },
+  }
 );
 
 const UserModel = model("user", userSchema);
