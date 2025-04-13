@@ -24,8 +24,16 @@ async function createCard({ name, link, owner }) {
   }
 }
 
-async function deleteCard(cardId) {
+async function deleteCard({ cardId, userId }) {
   try {
+    const card = await CardModel.findById(cardId);
+    if (card.owner.toString() !== userId) {
+      const newError = new CustomHttpError({
+        message: "O usuário não é dono desse cartão",
+      });
+      newError.badRequest({ method: "MONGO", path: "Delete Card" });
+      throw newError;
+    }
     const deletedCard = await CardModel.findByIdAndDelete(cardId);
     return deletedCard;
   } catch (error) {

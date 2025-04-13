@@ -4,7 +4,7 @@ import { z } from "zod";
 import CustomHttpError from "../errors/CustomHttpError.js";
 import {
   validateCreateCard,
-  validateLikeCard,
+  validateUpdateCard,
 } from "../validator/cardValidator.js";
 
 import {
@@ -68,8 +68,10 @@ cardsRouter.post("/", async (req, res) => {
 
 cardsRouter.delete("/:cardId", async (req, res) => {
   const { cardId } = req.params;
+  const userId = req.user._id;
   try {
-    const deletedCard = await deleteCard(cardId);
+    validateUpdateCard.parse({ cardId, userId });
+    const deletedCard = await deleteCard({ cardId, userId });
     if (!deletedCard) {
       const newError = new CustomHttpError({
         message: `Não foi possivel deletar cartão com id: ${cardId}.`,
@@ -91,7 +93,7 @@ cardsRouter.put("/:cardId/likes", async (req, res) => {
   const { cardId } = req.params;
   const userId = req.user._id;
   try {
-    validateLikeCard.parse({ cardId, userId });
+    validateUpdateCard.parse({ cardId, userId });
     const newCard = await likeCard({ cardId, userId });
     if (!newCard) {
       const newError = new CustomHttpError({
@@ -122,7 +124,7 @@ cardsRouter.delete("/:cardId/likes", async (req, res) => {
   const { cardId } = req.params;
   const userId = req.user._id;
   try {
-    validateLikeCard.parse({ cardId, userId });
+    validateUpdateCard.parse({ cardId, userId });
     const newCard = await deslikeCard({ cardId, userId });
     if (!newCard) {
       const newError = new CustomHttpError({

@@ -5,9 +5,9 @@ const validateCreateCard = z.object({
   link: z.string().url(),
   owner: z.string(),
 });
-const validateLikeCard = z.object({
+const validateUpdateCard = z.object({
   cardId: z.string(),
   userId: z.string(),
 });
 
-export { validateCreateCard, validateLikeCard };
+export { validateCreateCard, validateUpdateCard };
