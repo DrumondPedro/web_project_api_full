@@ -4,6 +4,7 @@ import ImagePopup from '../Popup/components/ImagePopup/ImagePopup';
 import ConfirmDeletion from '../Popup/components/ConfirmDeletion/ConfirmDeletion';
 
 import { CardsContext } from '../../../../contexts/CardsContext';
+import { LocalDataContext } from '../../../../contexts/LocalDataContext';
 import { CurrentUserContext } from '../../../../contexts/CurrentUserContext';
 import { PopupContext } from '../../../../contexts/PopupContext';
 import { LoadingContext } from '../../../../contexts/LoadingContext';
@@ -14,6 +15,7 @@ function Card({ card }) {
   const { handleCardDelete, handleCardLike, handleCardDisike } =
     useContext(CardsContext);
   const { currentUser } = useContext(CurrentUserContext);
+  const { TokenInfo } = useContext(LocalDataContext);
   const { handleOpenPopup, handleClosePopup } = useContext(PopupContext);
   const { setIsLoading } = useContext(LoadingContext);
 
@@ -33,13 +35,15 @@ function Card({ card }) {
   }, [card]);
 
   async function handleDelete() {
-    if (currentCard.owner === currentUser._id) {
+    if (currentCard.owner._id === currentUser._id) {
       setIsLoading(true);
-      await handleCardDelete(currentCard._id);
+      const token = TokenInfo.get();
+      await handleCardDelete(currentCard._id, token);
       setIsLoading(false);
       handleClosePopup();
     } else {
       console.error('O usuário não é dono desse card');
+      handleClosePopup();
     }
   }
 
@@ -52,12 +56,17 @@ function Card({ card }) {
   }
 
   async function handleLikeButtonClick() {
-    if (currentCard.isLiked) {
-      await handleCardDisike(currentCard._id, (res) => {
+    const token = TokenInfo.get();
+    if (
+      currentCard.likes.find((element) => {
+        return element._id === currentUser._id;
+      })
+    ) {
+      await handleCardDisike(currentCard._id, token, (res) => {
         setCurrentCard(res);
       });
     } else {
-      await handleCardLike(currentCard._id, (res) => {
+      await handleCardLike(currentCard._id, token, (res) => {
         setCurrentCard(res);
       });
     }
@@ -70,7 +79,7 @@ function Card({ card }) {
         src={deleteButton}
         alt='Ícone de uma lixeira'
         className={`gallery__card-delete-button ${
-          currentCard.owner === currentUser._id
+          currentCard.owner._id === currentUser._id
             ? `gallery__card-delete-button-visible`
             : ''
         }`}
@@ -87,11 +96,16 @@ function Card({ card }) {
           <button
             onClick={handleLikeButtonClick}
             aria-label='Like do cartão'
-            className={`gallery__card-like-button 
-              ${currentCard.isLiked ? 'gallery__card-like-button-active' : ''}`}
+            className={`gallery__card-like-button ${
+              currentCard.likes.find((element) => {
+                return element._id === currentUser._id;
+              })
+                ? 'gallery__card-like-button-active'
+                : ''
+            }`}
           ></button>
           <p className='gallery__card-like-counter'>
-            {currentCard.isLiked ? '1' : '0'}
+            {currentCard.likes.length}
           </p>
         </div>
       </div>

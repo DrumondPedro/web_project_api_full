@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from 'react';
+import { createContext, useState } from 'react';
 
 import { client } from '../utils/api';
 
@@ -7,9 +7,9 @@ export const CardsContext = createContext();
 export function CardsProvider({ children }) {
   const [cards, setCards] = useState([]);
 
-  async function handleInitialCards() {
+  async function handleInitialCards(token) {
     try {
-      const data = await client.getInitialCards('/cards');
+      const data = await client.getInitialCards('/cards', token);
       setCards(data);
     } catch (error) {
       console.log('GET - /cards -', error);
@@ -17,50 +17,47 @@ export function CardsProvider({ children }) {
     }
   }
 
-  async function handleCardCreation(newCardData) {
+  async function handleCardCreation(token, newCardData) {
     try {
-      const newCard = await client.addNewCard(newCardData, '/cards');
+      const newCard = await client.addNewCard('/cards', token, newCardData);
       setCards([newCard, ...cards]);
     } catch (error) {
       console.log('POST - /cards -', error);
     }
   }
 
-  async function handleCardLike(id, executor) {
+  async function handleCardLike(id, token, executor) {
     try {
-      const cardLiked = await client.like(`/cards/${id}/likes`);
+      const cardLiked = await client.like(`/cards/${id}/likes`, token);
       executor(cardLiked);
     } catch (error) {
       console.log(`PUT - /cards/${id}/likes -`, error);
     }
   }
 
-  async function handleCardDisike(id, executor) {
+  async function handleCardDisike(id, token, executor) {
     try {
-      const cardDesliked = await client.dislike(`/cards/${id}/likes`);
+      const cardDesliked = await client.dislike(`/cards/${id}/likes`, token);
       executor(cardDesliked);
     } catch (error) {
       console.log(`DELETE - /cards/${id}/likes -`, error);
     }
   }
 
-  async function handleCardDelete(selectedCardId) {
+  async function handleCardDelete(id, token) {
     try {
-      await client.deleteCard(`/cards/${selectedCardId}`);
-      setCards(cards.filter((card) => card._id !== selectedCardId));
+      await client.deleteCard(`/cards/${id}`, token);
+      setCards(cards.filter((card) => card._id !== id));
     } catch (error) {
-      console.log(`DELETE - /cards/${selectedCardId} -`, error);
+      console.log(`DELETE - /cards/${id} -`, error);
     }
   }
-
-  useEffect(() => {
-    handleInitialCards();
-  }, []);
 
   return (
     <CardsContext.Provider
       value={{
         cards,
+        handleInitialCards,
         handleCardCreation,
         handleCardLike,
         handleCardDisike,

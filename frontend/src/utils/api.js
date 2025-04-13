@@ -1,15 +1,14 @@
 class Api {
-  constructor({ baseURL, userAuthorization }) {
+  constructor({ baseURL }) {
     this._baseURL = baseURL;
-    this._userAuthorization = userAuthorization;
   }
 
-  async getInitialCards(path) {
+  async getInitialCards(path, token) {
     try {
       const res = await fetch(`${this._baseURL}${path}`, {
         method: 'GET',
         headers: {
-          authorization: this._userAuthorization,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -24,12 +23,12 @@ class Api {
     }
   }
 
-  async addNewCard({ title: cardName, link: cardLink }, path) {
+  async addNewCard(path, token, { title: cardName, link: cardLink }) {
     try {
       const res = await fetch(`${this._baseURL}${path}`, {
         method: 'POST',
         headers: {
-          authorization: this._userAuthorization,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -49,12 +48,12 @@ class Api {
     }
   }
 
-  async like(path) {
+  async like(path, token) {
     try {
       const res = await fetch(`${this._baseURL}${path}`, {
         method: 'PUT',
         headers: {
-          authorization: this._userAuthorization,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -69,12 +68,12 @@ class Api {
     }
   }
 
-  async dislike(path) {
+  async dislike(path, token) {
     try {
       const res = await fetch(`${this._baseURL}${path}`, {
         method: 'DELETE',
         headers: {
-          authorization: this._userAuthorization,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -89,53 +88,32 @@ class Api {
     }
   }
 
-  async deleteCard(path) {
+  async deleteCard(path, token) {
     try {
       const res = await fetch(`${this._baseURL}${path}`, {
         method: 'DELETE',
         headers: {
-          authorization: this._userAuthorization,
+          Authorization: `Bearer ${token}`,
         },
       });
 
-      if (res.status !== 200) {
+      if (res.status !== 204) {
         throw new Error(`${res.status} - ${res.type}`);
       }
 
-      return res.json();
+      return;
     } catch (error) {
       console.log(error);
       throw error;
     }
   }
 
-  async getUserInfo(path) {
-    try {
-      const res = await fetch(`${this._baseURL}${path}`, {
-        method: 'GET',
-        headers: {
-          authorization: this._userAuthorization,
-        },
-      });
-
-      if (res.status !== 200) {
-        throw new Error(`${res.status} - ${res.type}`);
-      }
-
-      return res.json();
-    } catch (error) {
-      console.log(error);
-      throw error;
-    }
-  }
-
-  async getUserEmail(path, token) {
+  async getUserInfo(path, token) {
     try {
       const res = await fetch(`${this._baseURL}${path}`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
         },
       });
 
@@ -150,12 +128,12 @@ class Api {
     }
   }
 
-  async updateUserInfo(path, { name: userName, about: userAbout }) {
+  async updateUserInfo(path, token, { name: userName, about: userAbout }) {
     try {
       const res = await fetch(`${this._baseURL}${path}`, {
         method: 'PATCH',
         headers: {
-          authorization: this._userAuthorization,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -175,12 +153,12 @@ class Api {
     }
   }
 
-  async updateUserAvatar(path, picture) {
+  async updateUserAvatar(path, token, picture) {
     try {
       const res = await fetch(`${this._baseURL}${path}`, {
         method: 'PATCH',
         headers: {
-          authorization: this._userAuthorization,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ avatar: `${picture}` }),
@@ -199,11 +177,5 @@ class Api {
 }
 
 export const client = new Api({
-  baseURL: 'https://around-api.pt-br.tripleten-services.com/v1/',
-  userAuthorization: '340a3ec0-6497-41ea-985c-06f3bdaa364c',
-});
-
-export const clientEmail = new Api({
-  baseURL: 'https://se-register-api.en.tripleten-services.com/v1',
-  userAuthorization: '340a3ec0-6497-41ea-985c-06f3bdaa364c',
+  baseURL: 'http://localhost:3000',
 });

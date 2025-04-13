@@ -1,11 +1,13 @@
 import { useContext, useRef, useState } from 'react';
 
 import { CurrentUserContext } from '../../../../../../contexts/CurrentUserContext';
+import { LocalDataContext } from '../../../../../../contexts/LocalDataContext';
 import { LoadingContext } from '../../../../../../contexts/LoadingContext';
 import { PopupContext } from '../../../../../../contexts/PopupContext';
 
 function EditAvatar() {
   const { handleUpdateAvatar } = useContext(CurrentUserContext);
+  const { TokenInfo } = useContext(LocalDataContext);
   const { handleClosePopup } = useContext(PopupContext);
   const { isLoading, setIsLoading } = useContext(LoadingContext);
 
@@ -27,7 +29,8 @@ function EditAvatar() {
   async function handleSubimit(evt) {
     evt.preventDefault();
     setIsLoading(true);
-    await handleUpdateAvatar(picture.current.value);
+    const token = TokenInfo.get();
+    await handleUpdateAvatar(token, picture.current.value);
     setIsLoading(false);
     handleClosePopup();
   }

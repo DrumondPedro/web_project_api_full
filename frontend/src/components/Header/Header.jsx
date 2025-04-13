@@ -17,7 +17,7 @@ function Header() {
 
   const navigate = useNavigate();
 
-  const { userEmail } = useContext(CurrentUserContext);
+  const { currentUser } = useContext(CurrentUserContext);
   const { isLoggedIn, setIsloggedIn } = useContext(LoginContext);
   const { TokenInfo } = useContext(LocalDataContext);
 
@@ -66,7 +66,7 @@ function Header() {
 
     return (
       <>
-        <p className='header__email'>{userEmail.data.email}</p>
+        <p className='header__email'>{currentUser.email}</p>
         <button className='header__button' onClick={handleLogout}>
           Sair
         </button>
@@ -84,7 +84,7 @@ function Header() {
     <header className='header'>
       {isMenuOpen && (
         <div className='header__mobile-menu'>
-          <p className='header__email'>{userEmail.data.email}</p>
+          <p className='header__email'>{currentUser.email}</p>
           <button className='header__button' onClick={handleLogout}>
             Sair
           </button>

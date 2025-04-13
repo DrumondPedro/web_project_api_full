@@ -11,8 +11,8 @@ class Auth {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          password: `${userPassword}`,
           email: `${userEmail}`,
+          password: `${userPassword}`,
         }),
       });
 
@@ -35,12 +35,12 @@ class Auth {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          password: `${userPassword}`,
           email: `${userEmail}`,
+          password: `${userPassword}`,
         }),
       });
 
-      if (res.status !== 201) {
+      if (res.status !== 200) {
         throw new Error(`${res.status} - ${res.type}`);
       }
 
@@ -53,5 +53,5 @@ class Auth {
 }
 
 export default new Auth({
-  baseURL: 'https://se-register-api.en.tripleten-services.com/v1',
+  baseURL: 'http://localhost:3000',
 });

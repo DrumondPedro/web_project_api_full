@@ -3,6 +3,7 @@ import { useContext, useEffect } from 'react';
 import { Route, Routes } from 'react-router-dom';
 
 import { CurrentUserContext } from '../../contexts/CurrentUserContext';
+import { CardsContext } from '../../contexts/CardsContext';
 import { LocalDataContext } from '../../contexts/LocalDataContext';
 import { LoginContext } from '../../contexts/LoginContext';
 
@@ -14,14 +15,15 @@ import Footer from '../Footer/Footer';
 import ProtectedRoute from '../ProtectedRoute/ProtectedRoute';
 
 function App() {
-  const { handleUserInfo, handleUserEmail } = useContext(CurrentUserContext);
+  const { handleUserInfo } = useContext(CurrentUserContext);
+  const { handleInitialCards } = useContext(CardsContext);
   const { TokenInfo } = useContext(LocalDataContext);
   const { setIsloggedIn } = useContext(LoginContext);
 
   async function handleAutomaticLogin(token) {
     try {
-      await handleUserEmail(token);
-      await handleUserInfo();
+      await handleUserInfo(token);
+      await handleInitialCards(token);
       setIsloggedIn(true);
     } catch (error) {
       TokenInfo.remove();

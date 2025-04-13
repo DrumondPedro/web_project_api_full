@@ -1,6 +1,6 @@
 import { createContext, useState } from 'react';
 
-import { client, clientEmail } from '../utils/api';
+import { client } from '../utils/api';
 
 import loadingPhoto from '../assets/images/profile/profile_loading_photo.png';
 
@@ -11,20 +11,13 @@ export function CurrentUserProvider({ children }) {
     name: '...',
     about: '...',
     avatar: loadingPhoto,
+    email: '...',
     _id: '000',
-    cohort: '...',
   });
 
-  const [userEmail, setUserEmail] = useState({
-    data: {
-      _id: '000',
-      email: '...',
-    },
-  });
-
-  const handleUserInfo = async () => {
+  const handleUserInfo = async (token) => {
     try {
-      const userData = await client.getUserInfo('/users/me');
+      const userData = await client.getUserInfo('/users/me', token);
       setCurrentUser(userData);
     } catch (error) {
       console.log('GET - /users/me', error);
@@ -32,29 +25,24 @@ export function CurrentUserProvider({ children }) {
     }
   };
 
-  const handleUserEmail = async (token) => {
+  const handleUpdateUser = async (token, userData) => {
     try {
-      const userEmailData = await clientEmail.getUserEmail('/users/me', token);
-      setUserEmail(userEmailData);
-    } catch (error) {
-      console.log('GET - /users/me', error);
-      throw error;
-    }
-  };
-
-  const handleUpdateUser = async (userData) => {
-    try {
-      const userUpdated = await client.updateUserInfo('/users/me', userData);
+      const userUpdated = await client.updateUserInfo(
+        '/users/me',
+        token,
+        userData
+      );
       setCurrentUser(userUpdated);
     } catch (error) {
       console.log(`PATCH - /users/me -`, error);
     }
   };
 
-  const handleUpdateAvatar = async (picture) => {
+  const handleUpdateAvatar = async (token, picture) => {
     try {
       const avatarUpdated = await client.updateUserAvatar(
         '/users/me/avatar',
+        token,
         picture
       );
       setCurrentUser(avatarUpdated);
@@ -67,9 +55,7 @@ export function CurrentUserProvider({ children }) {
     <CurrentUserContext.Provider
       value={{
         currentUser,
-        userEmail,
         handleUserInfo,
-        handleUserEmail,
         handleUpdateUser,
         handleUpdateAvatar,
       }}

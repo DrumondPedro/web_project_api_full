@@ -1,11 +1,13 @@
 import { useContext, useRef, useState } from 'react';
 
 import { CardsContext } from '../../../../../../contexts/CardsContext';
+import { LocalDataContext } from '../../../../../../contexts/LocalDataContext';
 import { LoadingContext } from '../../../../../../contexts/LoadingContext';
 import { PopupContext } from '../../../../../../contexts/PopupContext';
 
 function NewCard() {
   const { handleCardCreation } = useContext(CardsContext);
+  const { TokenInfo } = useContext(LocalDataContext);
   const { handleClosePopup } = useContext(PopupContext);
   const { isLoading, setIsLoading } = useContext(LoadingContext);
 
@@ -48,7 +50,8 @@ function NewCard() {
   async function handleSubimit(evt) {
     evt.preventDefault();
     setIsLoading(true);
-    await handleCardCreation(newCard);
+    const token = TokenInfo.get();
+    await handleCardCreation(token, newCard);
     setIsLoading(false);
     handleClosePopup();
   }

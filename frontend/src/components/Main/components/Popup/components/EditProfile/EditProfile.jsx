@@ -1,11 +1,13 @@
 import { useContext, useRef, useState } from 'react';
 
 import { CurrentUserContext } from '../../../../../../contexts/CurrentUserContext';
+import { LocalDataContext } from '../../../../../../contexts/LocalDataContext';
 import { LoadingContext } from '../../../../../../contexts/LoadingContext';
 import { PopupContext } from '../../../../../../contexts/PopupContext';
 
 function EditProfile() {
   const { currentUser, handleUpdateUser } = useContext(CurrentUserContext);
+  const { TokenInfo } = useContext(LocalDataContext);
   const { handleClosePopup } = useContext(PopupContext);
   const { isLoading, setIsLoading } = useContext(LoadingContext);
 
@@ -51,7 +53,8 @@ function EditProfile() {
   async function handleSubimit(evt) {
     evt.preventDefault();
     setIsLoading(true);
-    await handleUpdateUser(user);
+    const token = TokenInfo.get();
+    await handleUpdateUser(token, user);
     setIsLoading(false);
     handleClosePopup();
   }
