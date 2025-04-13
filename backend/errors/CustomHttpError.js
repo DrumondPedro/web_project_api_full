@@ -13,6 +13,11 @@ class CustomHttpError extends Error {
     this.statusCode = 401;
   }
 
+  forbidden({ method, path }) {
+    this.typeError = `[${method}] - ${path}`;
+    this.statusCode = 403;
+  }
+
   notFound({ method, path }) {
     this.typeError = `[${method}] - ${path}`;
     this.statusCode = 404;

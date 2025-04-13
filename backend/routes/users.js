@@ -16,29 +16,50 @@ import {
 
 const userRouter = Router();
 
-userRouter.get("/", async (req, res) => {
-  try {
-    const users = await sendAllUsers();
-    if (!users.length) {
-      const newError = new CustomHttpError({
-        message: "Nenhum usuário encontrado",
-      });
-      newError.notFound({
-        method: "GET",
-        path: "Users",
-      });
-      throw newError;
-    }
-    res.json(users);
-  } catch (error) {
-    const { message, typeError, statusCode } = error;
-    console.log(`Error: ${message} - ${typeError} - Status: ${statusCode}`);
-    res.status(statusCode).json({ message: "Nenhum usuário encontrado." });
-  }
-});
+// userRouter.get("/", async (req, res) => {
+//   try {
+//     const users = await sendAllUsers();
+//     if (!users.length) {
+//       const newError = new CustomHttpError({
+//         message: "Nenhum usuário encontrado",
+//       });
+//       newError.notFound({
+//         method: "GET",
+//         path: "Users",
+//       });
+//       throw newError;
+//     }
+//     res.json(users);
+//   } catch (error) {
+//     const { message, typeError, statusCode } = error;
+//     console.log(`Error: ${message} - ${typeError} - Status: ${statusCode}`);
+//     res.status(statusCode).json({ message: "Nenhum usuário encontrado." });
+//   }
+// });
 
-userRouter.get("/:id", async (req, res) => {
-  const { id } = req.params;
+// userRouter.get("/:id", async (req, res) => {
+//   const { id } = req.params;
+//   try {
+//     const user = await sendUser(id);
+//     if (!user) {
+//       const newError = new CustomHttpError({
+//         message: `Não foi possivel encontrar suário com o ID: ${id}`,
+//       });
+//       newError.notFound({ method: "GET", path: "Users" });
+//       throw newError;
+//     }
+//     res.json(user);
+//   } catch (error) {
+//     const { message, typeError, statusCode } = error;
+//     console.log(`Error: ${message} - ${typeError} - Status:${statusCode}`);
+//     res
+//       .status(statusCode)
+//       .json({ message: `Não foi possivel encontrar suário com o ID: ${id}` });
+//   }
+// });
+
+userRouter.get("/me", async (req, res) => {
+  const id = req.user._id;
   try {
     const user = await sendUser(id);
     if (!user) {
