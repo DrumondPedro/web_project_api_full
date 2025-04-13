@@ -1,3 +1,7 @@
+const { VITE_BASE_URL, VITE_ENV } = import.meta.env;
+
+console.log(VITE_BASE_URL, VITE_ENV);
+
 class Auth {
   constructor({ baseURL }) {
     this._baseURL = baseURL;
@@ -53,5 +57,7 @@ class Auth {
 }
 
 export default new Auth({
-  baseURL: 'http://localhost:3000',
+  baseURL: `${
+    VITE_ENV === 'production' ? VITE_BASE_URL : 'http://localhost:3000'
+  }`,
 });

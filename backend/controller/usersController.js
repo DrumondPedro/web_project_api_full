@@ -1,8 +1,11 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import "dotenv/config";
 
 import { UserModel } from "../models/User.js";
 import CustomHttpError from "../errors/CustomHttpError.js";
+
+const { NODE_ENV, KEY_SECRET } = process.env;
 
 async function sendAllUsers() {
   try {
@@ -53,9 +56,13 @@ async function createUser({ name, about, avatar, email, password }) {
 async function login({ email, password }) {
   try {
     const user = await UserModel.findUserByCredentials({ email, password });
-    const token = jwt.sign({ _id: user._id }, "some-secret-key", {
-      expiresIn: "7d",
-    });
+    const token = jwt.sign(
+      { _id: user._id },
+      NODE_ENV === "production" ? KEY_SECRET : "alternative-test-key",
+      {
+        expiresIn: "7d",
+      }
+    );
     return { token };
   } catch (error) {
     const newError = new CustomHttpError({ message: error.message });

@@ -1,6 +1,9 @@
 import jwt from "jsonwebtoken";
+import "dotenv/config";
 
 import CustomHttpError from "../errors/CustomHttpError.js";
+
+const { NODE_ENV, KEY_SECRET } = process.env;
 
 export default (req, res, next) => {
   const { authorization } = req.headers;
@@ -13,7 +16,10 @@ export default (req, res, next) => {
       throw newError;
     }
     const token = authorization.replace("Bearer ", "");
-    const payload = jwt.verify(token, "some-secret-key");
+    const payload = jwt.verify(
+      token,
+      NODE_ENV === "production" ? KEY_SECRET : "alternative-test-key"
+    );
     req.user = payload;
   } catch (error) {
     const newError = new CustomHttpError({ message: error.message });

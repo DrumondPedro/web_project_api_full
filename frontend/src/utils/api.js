@@ -1,3 +1,5 @@
+const { VITE_BASE_URL, VITE_ENV } = import.meta.env;
+
 class Api {
   constructor({ baseURL }) {
     this._baseURL = baseURL;
@@ -177,5 +179,7 @@ class Api {
 }
 
 export const client = new Api({
-  baseURL: 'http://localhost:3000',
+  baseURL: `${
+    VITE_ENV === 'production' ? VITE_BASE_URL : 'http://localhost:3000'
+  }`,
 });
