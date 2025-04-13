@@ -48,7 +48,7 @@ cardsRouter.post("/", async (req, res) => {
       newError.badRequest({ method: "POST", path: "Create Card" });
       throw newError;
     }
-    res.json(newCard);
+    res.status(201).json(newCard);
   } catch (error) {
     if (error instanceof z.ZodError) {
       const [err] = error.issues;

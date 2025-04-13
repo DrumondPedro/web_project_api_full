@@ -16,7 +16,8 @@ async function sendAllCards() {
 async function createCard({ name, link, owner }) {
   try {
     const newCard = await CardModel.create({ name, link, owner });
-    return newCard;
+    const card = await CardModel.findById(newCard._id).populate("owner");
+    return card;
   } catch (error) {
     const newError = new CustomHttpError({ message: error.message });
     newError.badRequest({ method: "MONGO", path: "Create Card" });
@@ -49,7 +50,7 @@ async function likeCard({ cardId, userId }) {
       cardId,
       { $addToSet: { likes: userId } },
       { new: true }
-    );
+    ).populate(["owner", "likes"]);
     return newCards;
   } catch (error) {
     const newError = new CustomHttpError({ message: error.message });
@@ -64,7 +65,7 @@ async function deslikeCard({ cardId, userId }) {
       cardId,
       { $pull: { likes: userId } },
       { new: true }
-    );
+    ).populate(["owner", "likes"]);
     return newCards;
   } catch (error) {
     const newError = new CustomHttpError({ message: error.message });
@@ -74,7 +75,3 @@ async function deslikeCard({ cardId, userId }) {
 }
 
 export { sendAllCards, createCard, deleteCard, likeCard, deslikeCard };
-
-// const deleteAllCards = ({ owner }) {
-//   return await CardModel.deleteMany({ owner }).catch((err) => console.log(err));
-// };
