@@ -7,17 +7,6 @@ import CustomHttpError from "../errors/CustomHttpError.js";
 
 const { NODE_ENV, KEY_SECRET } = process.env;
 
-async function sendAllUsers() {
-  try {
-    const allUsers = await UserModel.find({});
-    return allUsers;
-  } catch (error) {
-    const newError = new CustomHttpError({ message: error.message });
-    newError.notFound({ method: "MONGO", path: "Users" });
-    throw newError;
-  }
-}
-
 async function sendUser(id) {
   try {
     const user = await UserModel.findById(id);
@@ -109,11 +98,4 @@ async function updateUserAvatar({ id, avatar }) {
   }
 }
 
-export {
-  sendAllUsers,
-  sendUser,
-  createUser,
-  updateUser,
-  updateUserAvatar,
-  login,
-};
+export { sendUser, createUser, updateUser, updateUserAvatar, login };

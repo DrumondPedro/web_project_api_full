@@ -10,7 +10,7 @@ export default (req, res, next) => {
   try {
     if (!authorization || !authorization.startsWith("Bearer ")) {
       const newError = new CustomHttpError({
-        message: `Token inválido`,
+        message: `Autorização necessária`,
       });
       newError.unauthorized({ method: `${req.method}`, path: "Auth" });
       throw newError;
@@ -18,15 +18,21 @@ export default (req, res, next) => {
     const token = authorization.replace("Bearer ", "");
     const payload = jwt.verify(
       token,
-      NODE_ENV === "production" ? KEY_SECRET : "alternative-test-key"
+      NODE_ENV === "production" ? KEY_SECRET : "alternative-test-key",
+      (err, payload) => {
+        if (err) {
+          const newError = new CustomHttpError({
+            message: `Token inválido`,
+          });
+          newError.forbidden({ method: `${req.method}`, path: "Auth" });
+          throw newError;
+        }
+        return payload;
+      }
     );
     req.user = payload;
-  } catch (error) {
-    const newError = new CustomHttpError({ message: error.message });
-    newError.unauthorized({ method: `${req.method}`, path: "Auth" });
-    const { message, typeError, statusCode } = newError;
-    console.log(`Error: ${message} - ${typeError} - Status:${statusCode}`);
-    return res.status(statusCode).send({ message: `Autorização necessária.` });
+  } catch (err) {
+    next(err);
   }
   next();
 };

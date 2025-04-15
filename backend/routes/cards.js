@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { z } from "zod";
 
 import CustomHttpError from "../errors/CustomHttpError.js";
 import {
@@ -17,25 +16,26 @@ import {
 
 const cardsRouter = Router();
 
-cardsRouter.get("/", async (req, res) => {
+cardsRouter.get("/", async (req, res, next) => {
   try {
     const cards = await sendAllCards();
     if (!cards.length) {
       const newError = new CustomHttpError({
         message: "Nenhum cartão encontrado",
       });
-      newError.notFound({ method: "GET", path: "Cards" });
+      newError.notFound({
+        method: `${req.method}`,
+        path: `${req.originalUrl}`,
+      });
       throw newError;
     }
     res.json(cards);
-  } catch (error) {
-    const { message, typeError, statusCode } = error;
-    console.log(`Error: ${message} - ${typeError} - Status: ${statusCode}`);
-    res.status(statusCode).json({ message: "Nenhum cartão encontrado." });
+  } catch (err) {
+    next(err);
   }
 });
 
-cardsRouter.post("/", async (req, res) => {
+cardsRouter.post("/", async (req, res, next) => {
   const { name, link } = req.body;
   const owner = req.user._id;
   try {
@@ -43,30 +43,21 @@ cardsRouter.post("/", async (req, res) => {
     const newCard = await createCard({ name, link, owner });
     if (!newCard) {
       const newError = new CustomHttpError({
-        message: `Não foi possivel criar cartão.`,
+        message: `Não foi possivel criar o cartão.`,
       });
-      newError.badRequest({ method: "POST", path: "Create Card" });
+      newError.badRequest({
+        method: `${req.method}`,
+        path: `${req.originalUrl}`,
+      });
       throw newError;
     }
     res.status(201).json(newCard);
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      const [err] = error.issues;
-      const newError = new CustomHttpError({
-        message: `${err.path}: ${err.message}`,
-      });
-      newError.badRequest({ method: "POST", path: "Create Card" });
-      error = newError;
-    }
-    const { message, typeError, statusCode } = error;
-    console.log(`Error: ${message} - ${typeError} - Status: ${statusCode}`);
-    res
-      .status(statusCode)
-      .json({ message: "Não foi possivel criar o cartão." });
+  } catch (err) {
+    next(err);
   }
 });
 
-cardsRouter.delete("/:cardId", async (req, res) => {
+cardsRouter.delete("/:cardId", async (req, res, next) => {
   const { cardId } = req.params;
   const userId = req.user._id;
   try {
@@ -74,22 +65,21 @@ cardsRouter.delete("/:cardId", async (req, res) => {
     const deletedCard = await deleteCard({ cardId, userId });
     if (!deletedCard) {
       const newError = new CustomHttpError({
-        message: `Não foi possivel deletar cartão com id: ${cardId}.`,
+        message: `Não foi possivel deletar o cartão com id: ${cardId}.`,
       });
-      newError.badRequest({ method: "POST", path: "Delete Card" });
+      newError.badRequest({
+        method: `${req.method}`,
+        path: `${req.originalUrl}`,
+      });
       throw newError;
     }
     res.status(204).json({});
-  } catch (error) {
-    const { message, typeError, statusCode } = error;
-    console.log(`Error: ${message} - ${typeError} - Status: ${statusCode}`);
-    res
-      .status(statusCode)
-      .json({ message: `Não foi possivel deletar o cartão com id ${cardId}` });
+  } catch (err) {
+    next(err);
   }
 });
 
-cardsRouter.put("/:cardId/likes", async (req, res) => {
+cardsRouter.put("/:cardId/likes", async (req, res, next) => {
   const { cardId } = req.params;
   const userId = req.user._id;
   try {
@@ -97,30 +87,21 @@ cardsRouter.put("/:cardId/likes", async (req, res) => {
     const newCard = await likeCard({ cardId, userId });
     if (!newCard) {
       const newError = new CustomHttpError({
-        message: `Não foi possivel curtir o cartão.`,
+        message: `Não foi possivel curtir o cartão com id: ${cardId}`,
       });
-      newError.badRequest({ method: "POST", path: "Like Card" });
+      newError.badRequest({
+        method: `${req.method}`,
+        path: `${req.originalUrl}`,
+      });
       throw newError;
     }
     res.json(newCard);
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      const [err] = error.issues;
-      const newError = new CustomHttpError({
-        message: `${err.path}: ${err.message}`,
-      });
-      newError.badRequest({ method: "POST", path: "Like Card" });
-      error = newError;
-    }
-    const { message, typeError, statusCode } = error;
-    console.log(`Error: ${message} - ${typeError} - Status: ${statusCode}`);
-    res
-      .status(statusCode)
-      .json({ message: `Não foi possivel curtir o cartão com id ${cardId}` });
+  } catch (err) {
+    next(err);
   }
 });
 
-cardsRouter.delete("/:cardId/likes", async (req, res) => {
+cardsRouter.delete("/:cardId/likes", async (req, res, next) => {
   const { cardId } = req.params;
   const userId = req.user._id;
   try {
@@ -128,26 +109,17 @@ cardsRouter.delete("/:cardId/likes", async (req, res) => {
     const newCard = await deslikeCard({ cardId, userId });
     if (!newCard) {
       const newError = new CustomHttpError({
-        message: `Não foi possivel descurtir o cartão.`,
+        message: `Não foi possivel descurtir o cartão com id ${cardId}`,
       });
-      newError.badRequest({ method: "POST", path: "Deslike Card" });
+      newError.badRequest({
+        method: `${req.method}`,
+        path: `${req.originalUrl}`,
+      });
       throw newError;
     }
     res.json(newCard);
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      const [err] = error.issues;
-      const newError = new CustomHttpError({
-        message: `${err.path}: ${err.message}`,
-      });
-      newError.badRequest({ method: "POST", path: "Deslike Card" });
-      error = newError;
-    }
-    const { message, typeError, statusCode } = error;
-    console.log(`Error: ${message} - ${typeError} - Status: ${statusCode}`);
-    res.status(statusCode).json({
-      message: `Não foi possivel descurtir o cartão com id ${cardId}`,
-    });
+  } catch (err) {
+    next(err);
   }
 });
 

@@ -59,22 +59,19 @@ const userSchema = new Schema(
         try {
           const user = await this.findOne({ email }).select("+password");
           if (!user) {
-            const newError = new CustomHttpError({
+            throw new CustomHttpError({
               message: `E-mail ou senha incorretos`,
             });
-            throw newError;
           }
           const matched = await bcrypt.compare(password, user.password);
           if (!matched) {
-            const newError = new CustomHttpError({
+            throw new CustomHttpError({
               message: `E-mail ou senha incorretos`,
             });
-            throw newError;
           }
           return user;
         } catch (error) {
-          const newError = new CustomHttpError({ message: error.message });
-          throw newError;
+          throw error;
         }
       },
     },
