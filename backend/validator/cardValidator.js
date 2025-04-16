@@ -3,7 +3,7 @@ import { z } from "zod";
 const validateCreateCard = z.object({
   name: z.string().max(30).min(2),
   link: z.string().url(),
-  owner: z.string(),
+  ownerId: z.string(),
 });
 const validateUpdateCard = z.object({
   cardId: z.string(),

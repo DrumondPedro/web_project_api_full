@@ -2,6 +2,7 @@ import { Router } from "express";
 
 import CustomHttpError from "../errors/CustomHttpError.js";
 import {
+  validateIdUser,
   validateUpdateUser,
   validateUpdateAvatar,
 } from "../validator/userValidator.js";
@@ -15,12 +16,13 @@ import {
 const userRouter = Router();
 
 userRouter.get("/me", async (req, res, next) => {
-  const id = req.user._id;
+  const userId = req.user._id;
   try {
-    const user = await sendUser(id);
+    validateIdUser.parse({ userId });
+    const user = await sendUser(userId);
     if (!user) {
       const newError = new CustomHttpError({
-        message: `Não foi possivel encontrar suário com o ID: ${id}`,
+        message: `Não foi possivel encontrar suário com o ID: ${userId}`,
       });
       newError.notFound({
         method: `${req.method}`,
@@ -36,13 +38,13 @@ userRouter.get("/me", async (req, res, next) => {
 
 userRouter.patch("/me", async (req, res, next) => {
   const { name, about } = req.body;
-  const id = req.user._id;
+  const userId = req.user._id;
   try {
-    validateUpdateUser.parse({ id, name, about });
-    const updetedUser = await updateUser({ id, name, about });
+    validateUpdateUser.parse({ userId, name, about });
+    const updetedUser = await updateUser({ userId, name, about });
     if (!updetedUser) {
       const newError = new CustomHttpError({
-        message: `Não foi possivel atualizar suário com o ID: ${id}`,
+        message: `Não foi possivel atualizar suário com o ID: ${userId}`,
       });
       newError.badRequest({
         method: `${req.method}`,
@@ -58,13 +60,13 @@ userRouter.patch("/me", async (req, res, next) => {
 
 userRouter.patch("/me/avatar", async (req, res, next) => {
   const { avatar } = req.body;
-  const id = req.user._id;
+  const userId = req.user._id;
   try {
-    validateUpdateAvatar.parse({ id, avatar });
-    const updetedUser = await updateUserAvatar({ id, avatar });
+    validateUpdateAvatar.parse({ userId, avatar });
+    const updetedUser = await updateUserAvatar({ userId, avatar });
     if (!updetedUser) {
       const newError = new CustomHttpError({
-        message: `Não foi possivel atualizar o avatar do suário com o ID: ${id}`,
+        message: `Não foi possivel atualizar o avatar do suário com o ID: ${userId}`,
       });
       newError.badRequest({
         method: `${req.method}`,

@@ -37,10 +37,10 @@ cardsRouter.get("/", async (req, res, next) => {
 
 cardsRouter.post("/", async (req, res, next) => {
   const { name, link } = req.body;
-  const owner = req.user._id;
+  const ownerId = req.user._id;
   try {
-    validateCreateCard.parse({ name, link, owner });
-    const newCard = await createCard({ name, link, owner });
+    validateCreateCard.parse({ name, link, ownerId });
+    const newCard = await createCard({ name, link, ownerId });
     if (!newCard) {
       const newError = new CustomHttpError({
         message: `Não foi possivel criar o cartão.`,
