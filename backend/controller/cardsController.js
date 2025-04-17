@@ -13,9 +13,9 @@ async function sendAllCards() {
   }
 }
 
-async function createCard({ name, link, owner }) {
+async function createCard({ name, link, ownerId }) {
   try {
-    const newCard = await CardModel.create({ name, link, owner });
+    const newCard = await CardModel.create({ name, link, owner: ownerId });
     const card = await CardModel.findById(newCard._id).populate("owner");
     return card;
   } catch (error) {

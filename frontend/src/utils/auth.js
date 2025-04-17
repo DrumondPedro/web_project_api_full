@@ -1,7 +1,5 @@
 const { VITE_BASE_URL, VITE_ENV } = import.meta.env;
 
-console.log(VITE_BASE_URL, VITE_ENV);
-
 class Auth {
   constructor({ baseURL }) {
     this._baseURL = baseURL;

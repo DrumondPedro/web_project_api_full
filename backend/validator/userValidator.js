@@ -23,4 +23,9 @@ const validateUpdateAvatar = z.object({
   avatar: z.string().url(),
 });
 
-export { validateCreateUser, validateUpdateUser, validateUpdateAvatar };
+export {
+  validateCreateUser,
+  validateIdUser,
+  validateUpdateUser,
+  validateUpdateAvatar,
+};

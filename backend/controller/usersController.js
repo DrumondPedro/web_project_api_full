@@ -60,10 +60,10 @@ async function login({ email, password }) {
   }
 }
 
-async function updateUser({ id, name, about }) {
+async function updateUser({ userId, name, about }) {
   try {
     const updetedUser = await UserModel.findByIdAndUpdate(
-      id,
+      userId,
       { name, about },
       {
         new: true,
@@ -79,10 +79,10 @@ async function updateUser({ id, name, about }) {
   }
 }
 
-async function updateUserAvatar({ id, avatar }) {
+async function updateUserAvatar({ userId, avatar }) {
   try {
     const updetedUser = await UserModel.findByIdAndUpdate(
-      id,
+      userId,
       { avatar },
       {
         new: true,
