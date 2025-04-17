@@ -10,6 +10,7 @@ import { userRouter } from "./routes/users.js";
 import { cardsRouter } from "./routes/cards.js";
 
 import CustomHttpError from "./errors/CustomHttpError.js";
+import { requestLogger, errorLogger } from "./middlewares/logger.js";
 
 const app = express();
 connectDatabase();
@@ -19,6 +20,8 @@ app.use(express.json());
 
 app.use(cors());
 app.options("*", cors());
+
+app.use(requestLogger);
 
 const notFound = (req, res, next) => {
   res.status(404).send({ message: "A solicitação não foi encontrada" });
@@ -32,6 +35,8 @@ app.use(auth);
 app.use("/users", userRouter);
 app.use("/cards", cardsRouter);
 app.use("", notFound);
+
+app.use(errorLogger);
 
 app.use((error, req, res, next) => {
   if (error instanceof z.ZodError) {
