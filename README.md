@@ -1,4 +1,4 @@
-# Projec Around USA
+# Projeto Around USA
 
 Esse é um projeto que desenvolvi durante o curso de desenvolvimento web da TripleTen.
 
