@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { z } from "zod";
+import "dotenv/config";
 
 import { connectDatabase } from "./data/database.js";
 import auth from "./middlewares/auth.js";

@@ -19,7 +19,7 @@ export default (req, res, next) => {
     const payload = jwt.verify(
       token,
       NODE_ENV === "production" ? KEY_SECRET : "alternative-test-key",
-      (err, payload) => {
+      (err, data) => {
         if (err) {
           const newError = new CustomHttpError({
             message: `Token inválido`,
@@ -27,7 +27,7 @@ export default (req, res, next) => {
           newError.forbidden({ method: `${req.method}`, path: "Auth" });
           throw newError;
         }
-        return payload;
+        return data;
       }
     );
     req.user = payload;

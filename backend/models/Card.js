@@ -1,5 +1,7 @@
 import { Schema, model } from "mongoose";
 
+import validator from "validator";
+
 const cardSchema = new Schema(
   {
     name: {
@@ -13,9 +15,7 @@ const cardSchema = new Schema(
       required: true,
       validate: {
         validator: (v) => {
-          return /^(https?:\/\/)(www\.)?([a-zA-Z0-9._~:/?%#\[\]@!$&'()*+,;=-]+)(\/[a-zA-Z0-9._~:/?%#\[\]@!$&'()*+,;=-]*)?(#\w*)?$/.test(
-            v
-          );
+          return validator.isURL(v);
         },
         message: "Essa não é uma URL valida",
       },

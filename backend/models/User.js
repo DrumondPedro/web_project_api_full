@@ -27,9 +27,7 @@ const userSchema = new Schema(
         "https://practicum-content.s3.us-west-1.amazonaws.com/resources/moved_avatar_1604080799.jpg",
       validate: {
         validator: (v) => {
-          return /^(https?:\/\/)(www\.)?([a-zA-Z0-9._~:/?%#\[\]@!$&'()*+,;=-]+)(\/[a-zA-Z0-9._~:/?%#\[\]@!$&'()*+,;=-]*)?(#\w*)?$/.test(
-            v
-          );
+          return validator.isURL(v);
         },
         message: "Essa não é uma URL valida",
       },

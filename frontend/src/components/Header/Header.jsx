@@ -29,6 +29,7 @@ function Header() {
 
   const handleLogout = () => {
     setIsloggedIn(false);
+    setIsMenuOpen(false);
     TokenInfo.remove();
     navigate('/login');
   };

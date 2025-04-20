@@ -1,6 +1,5 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import "dotenv/config";
 
 import { UserModel } from "../models/User.js";
 import CustomHttpError from "../errors/CustomHttpError.js";
