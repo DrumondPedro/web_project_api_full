@@ -28,6 +28,12 @@ const notFound = (req, res, next) => {
   res.status(404).send({ message: "A solicitação não foi encontrada" });
 };
 
+app.get("/crash-test", () => {
+  setTimeout(() => {
+    throw new Error("O servidor travará agora");
+  }, 0);
+});
+
 app.use("/signup", signupRouter);
 app.use("/signin", signinRouter);
 
